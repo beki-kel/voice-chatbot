@@ -4,12 +4,24 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
+export const VOICES = [
+  { id: 'en-US-Neural2-J', name: 'James', gender: 'Male', accent: 'US' },
+  { id: 'en-US-Neural2-D', name: 'David', gender: 'Male', accent: 'US' },
+  { id: 'en-US-Neural2-H', name: 'Hannah', gender: 'Female', accent: 'US' },
+  { id: 'en-US-Neural2-F', name: 'Fiona', gender: 'Female', accent: 'US' },
+  { id: 'en-GB-Neural2-B', name: 'Brian', gender: 'Male', accent: 'UK' },
+  { id: 'en-GB-Neural2-A', name: 'Amy', gender: 'Female', accent: 'UK' },
+  { id: 'en-AU-Neural2-B', name: 'Bruce', gender: 'Male', accent: 'AU' },
+  { id: 'en-AU-Neural2-A', name: 'Ava', gender: 'Female', accent: 'AU' },
+] as const;
+
 export function useVoiceChat() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [provider, setProvider] = useState('gemini');
+  const [voice, setVoice] = useState(VOICES[0].id);
   const [error, setError] = useState<string | null>(null);
   const [streamingText, setStreamingText] = useState('');
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
@@ -99,7 +111,7 @@ export function useVoiceChat() {
           const ttsRes = await fetch('/api/text-to-speech', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: chatData.response }),
+            body: JSON.stringify({ text: chatData.response, voice }),
           });
           const ttsData = await ttsRes.json();
           
@@ -142,7 +154,7 @@ export function useVoiceChat() {
       };
       mediaRecorderRef.current!.stop();
     });
-  }, [messages, provider]);
+  }, [messages, provider, voice]);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) {
@@ -175,6 +187,6 @@ export function useVoiceChat() {
   return {
     isRecording, isProcessing, isSpeaking, messages, provider, error,
     startRecording, stopRecording, stopSpeaking, setProvider, clearMessages,
-    streamingText, currentTypingIndex,
+    streamingText, currentTypingIndex, voice, setVoice,
   };
 }

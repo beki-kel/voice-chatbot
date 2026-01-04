@@ -5,13 +5,17 @@ export async function POST(request: NextRequest) {
     console.log('[TTS] Request received');
     console.log('[TTS] GOOGLE_API_KEY present:', !!process.env.GOOGLE_API_KEY);
     
-    const { text } = await request.json();
+    const { text, voice = 'en-US-Neural2-J' } = await request.json();
     console.log('[TTS] Text to synthesize:', text);
+    console.log('[TTS] Voice:', voice);
     
     if (!text) {
       console.error('[TTS] No text provided');
       return NextResponse.json({ error: 'No text provided' }, { status: 400 });
     }
+
+    // Extract language code from voice name (e.g., "en-US-Neural2-J" -> "en-US")
+    const languageCode = voice.split('-').slice(0, 2).join('-');
 
     const response = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`,
@@ -21,9 +25,8 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           input: { text },
           voice: {
-            languageCode: 'en-US',
-            name: 'en-US-Neural2-J',
-            ssmlGender: 'MALE',
+            languageCode,
+            name: voice,
           },
           audioConfig: { audioEncoding: 'MP3' },
         }),
