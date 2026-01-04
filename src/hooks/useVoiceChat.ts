@@ -13,7 +13,9 @@ export const VOICES = [
   { id: 'en-GB-Neural2-A', name: 'Amy', gender: 'Female', accent: 'UK' },
   { id: 'en-AU-Neural2-B', name: 'Bruce', gender: 'Male', accent: 'AU' },
   { id: 'en-AU-Neural2-A', name: 'Ava', gender: 'Female', accent: 'AU' },
-] as const;
+];
+
+export type VoiceId = typeof VOICES[number]['id'];
 
 export function useVoiceChat() {
   const [isRecording, setIsRecording] = useState(false);
@@ -21,7 +23,7 @@ export function useVoiceChat() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [provider, setProvider] = useState('gemini');
-  const [voice, setVoice] = useState(VOICES[0].id);
+  const [voice, setVoice] = useState<string>(VOICES[0].id);
   const [error, setError] = useState<string | null>(null);
   const [streamingText, setStreamingText] = useState('');
   const [currentTypingIndex, setCurrentTypingIndex] = useState(0);
